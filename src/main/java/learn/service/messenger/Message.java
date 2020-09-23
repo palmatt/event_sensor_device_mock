@@ -7,10 +7,6 @@ public class Message {
 	private Listener listener;
 	private Object messageContent;
 
-	public Message() {
-
-	}
-
 	public Message(Topic topic, Listener listener, Object messageContent) {
 		this.topic = topic;
 		this.listener = listener;
@@ -25,24 +21,10 @@ public class Message {
 	}
 
 	/**
-	 * @param topic the topic to set
-	 */
-	public void setTopic(Topic topic) {
-		this.topic = topic;
-	}
-
-	/**
 	 * @return the listener
 	 */
 	public Listener getListener() {
 		return listener;
-	}
-
-	/**
-	 * @param listener the listener to set
-	 */
-	public void setListener(Listener listener) {
-		this.listener = listener;
 	}
 
 	/**
@@ -51,12 +33,4 @@ public class Message {
 	public Object getMessageContent() {
 		return messageContent;
 	}
-
-	/**
-	 * @param messageContent the messageContent to set
-	 */
-	public void setMessageContent(Object messageContent) {
-		this.messageContent = messageContent;
-	}
-
 }
