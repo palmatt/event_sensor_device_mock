@@ -11,4 +11,8 @@ public class ServiceException extends RuntimeException {
 		super("Exception thrown while running service mock");
 	}
 
+	public ServiceException(String message) {
+		super(message);
+	}
+
 }
