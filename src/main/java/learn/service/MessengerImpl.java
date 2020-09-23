@@ -3,16 +3,21 @@ package learn.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
+import learn.exception.ListenerException;
 import learn.exception.ServiceException;
+import learn.service.messenger.Message;
 import learn.service.messenger.Messenger;
 import learn.service.messenger.Topic;
 import learn.service.messenger.listener.Listener;
 
-public class MessengerImpl implements Messenger {
+public class MessengerImpl implements Messenger, Runnable {
 
 	private static MessengerImpl instance;
 	private ConcurrentHashMap<Topic, List<Listener>> topicListenerPair;
+	private ConcurrentLinkedQueue<Message> messages;
+	private boolean running = false;
 
 	private MessengerImpl() {
 		topicListenerPair = new ConcurrentHashMap<>();
@@ -27,8 +32,13 @@ public class MessengerImpl implements Messenger {
 
 	@Override
 	public void startService() throws ServiceException {
-		// TODO Auto-generated method stub
-
+		running = true;
+		try {
+			run();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new ServiceException();
+		}
 	}
 
 	@Override
@@ -47,10 +57,38 @@ public class MessengerImpl implements Messenger {
 	@Override
 	public void publish(Topic topic, Object message) {
 		List<Listener> listeners = topicListenerPair.get(topic);
-		if (listeners != null) {
-			listeners.forEach(s -> s.onMessage(message));
+		if (listeners != null && !listeners.isEmpty()) {
+			listeners.forEach(listener -> messages.add(new Message(topic, listener, message)));
 		}
-
 	}
 
+	@Override
+	public void stopService() {
+		running = false;
+	}
+
+	@Override
+	public void run() {
+		while (running) {
+			if (!messages.isEmpty()) {
+				Message message = messages.poll();
+				try {
+					message.getListener()
+						.onMessage(message.getMessageContent());
+				} catch (ListenerException e) {
+					e.printStackTrace();
+					messages.add(message);
+					throw new ListenerException();
+				}
+			} else {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					Thread.currentThread()
+						.interrupt();
+				}
+			}
+		}
+	}
 }
