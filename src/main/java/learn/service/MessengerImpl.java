@@ -21,6 +21,7 @@ public class MessengerImpl implements Messenger, Runnable {
 
 	private MessengerImpl() {
 		topicListenerPair = new ConcurrentHashMap<>();
+		messages = new ConcurrentLinkedQueue<Message>();
 	}
 
 	public static MessengerImpl getInstance() {
