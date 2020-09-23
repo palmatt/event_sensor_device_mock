@@ -31,7 +31,7 @@ public class MessengerImpl implements Messenger, Runnable {
 	}
 
 	@Override
-	public void startService() throws ServiceException {
+	public void startService() {
 		running = true;
 		try {
 			run();
