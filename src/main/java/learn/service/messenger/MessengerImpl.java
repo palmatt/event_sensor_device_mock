@@ -1,4 +1,4 @@
-package learn.service;
+package learn.service.messenger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,17 +7,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import learn.exception.ListenerException;
 import learn.exception.ServiceException;
-import learn.service.messenger.Message;
-import learn.service.messenger.Messenger;
-import learn.service.messenger.Topic;
+import learn.service.MyService;
 import learn.service.messenger.listener.Listener;
+import learn.service.messenger.message.Message;
+import learn.service.messenger.topic.Topic;
 
-public class MessengerImpl implements Messenger, Runnable {
+public class MessengerImpl implements MyService, Messenger, Runnable {
 
 	private static MessengerImpl instance;
 	private ConcurrentHashMap<Topic, List<Listener>> topicListenerPair;
 	private ConcurrentLinkedQueue<Message> messages;
-	private boolean running = false;
+	private volatile boolean running = false;
 
 	private MessengerImpl() {
 		topicListenerPair = new ConcurrentHashMap<>();
@@ -35,7 +35,8 @@ public class MessengerImpl implements Messenger, Runnable {
 	public void startService() {
 		running = true;
 		try {
-			run();
+			Thread thread = new Thread(this);
+			thread.start();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ServiceException();
@@ -91,5 +92,11 @@ public class MessengerImpl implements Messenger, Runnable {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void unSubscribe(Topic topic, Listener listener) {
+		// TODO Auto-generated method stub
+
 	}
 }

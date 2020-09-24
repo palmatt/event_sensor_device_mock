@@ -1,4 +1,4 @@
-package learn.service.sensor;
+package learn.service.sensor.temperature;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -6,17 +6,18 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import learn.exception.ServiceException;
-import learn.service.MessengerImpl;
 import learn.service.MyService;
 import learn.service.messenger.Messenger;
-import learn.service.messenger.Topic;
+import learn.service.messenger.MessengerImpl;
+import learn.service.messenger.topic.Topic;
+import learn.service.sensor.Sensor;
 
-public class TemperatureServiceMock implements MyService, Runnable {
+public class TemperatureServiceMock implements MyService, Runnable, Sensor {
 	private static final Integer PROBABILITY = 70;
 	private AtomicInteger temperature = new AtomicInteger(-1);
 	private Messenger messenger;
 	private Random random;
-	private boolean running = false;
+	private volatile boolean running = false;
 	private String name;
 
 	public TemperatureServiceMock(String name) {
@@ -28,6 +29,7 @@ public class TemperatureServiceMock implements MyService, Runnable {
 	public TemperatureServiceMock() {
 		messenger = MessengerImpl.getInstance();
 		random = new Random();
+		name = "Temperature";
 	}
 
 	@Override
@@ -48,7 +50,8 @@ public class TemperatureServiceMock implements MyService, Runnable {
 	public void startService() {
 		try {
 			running = true;
-			run();
+			Thread thread = new Thread(this);
+			thread.start();
 			temperature.set(23);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -95,5 +98,4 @@ public class TemperatureServiceMock implements MyService, Runnable {
 		int randomNumber = random.nextInt(2);
 		return randomNumber - random.nextInt(2);
 	}
-
 }

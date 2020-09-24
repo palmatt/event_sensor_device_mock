@@ -1,6 +1,7 @@
-package learn.service.messenger;
+package learn.service.messenger.message;
 
 import learn.service.messenger.listener.Listener;
+import learn.service.messenger.topic.Topic;
 
 public class Message {
 	private Topic topic;

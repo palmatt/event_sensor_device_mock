@@ -1,9 +1,13 @@
 package learn.runner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import learn.exception.ServiceException;
 import learn.service.MyService;
+import learn.service.dummy.DummyService;
+import learn.service.messenger.MessengerImpl;
+import learn.service.sensor.temperature.TemperatureServiceMock;
 
 public class ServiceRunnerImpl implements ServiceRunner {
 
@@ -11,7 +15,8 @@ public class ServiceRunnerImpl implements ServiceRunner {
 	private static ServiceRunnerImpl instance;
 
 	private ServiceRunnerImpl() {
-
+		services = new ArrayList<>();
+		retrieveServiceList();
 	}
 
 	public static ServiceRunnerImpl getInstance() {
@@ -32,6 +37,12 @@ public class ServiceRunnerImpl implements ServiceRunner {
 			serviceException.printStackTrace();
 		}
 		return executed;
+	}
+
+	private void retrieveServiceList() {
+		services.add(MessengerImpl.getInstance());
+		services.add(new TemperatureServiceMock());
+		services.add(new DummyService());
 	}
 
 }
