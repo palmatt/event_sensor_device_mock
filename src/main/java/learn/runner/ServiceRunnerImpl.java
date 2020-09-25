@@ -7,6 +7,8 @@ import learn.exception.ServiceException;
 import learn.service.MyService;
 import learn.service.dummy.DummyService;
 import learn.service.messenger.MessengerImpl;
+import learn.service.messenger.topic.Topic;
+import learn.service.sensor.humidity.HumidityServiceMock;
 import learn.service.sensor.temperature.TemperatureServiceMock;
 
 public class ServiceRunnerImpl implements ServiceRunner {
@@ -31,7 +33,7 @@ public class ServiceRunnerImpl implements ServiceRunner {
 		boolean executed = false;
 
 		try {
-			services.forEach(s -> s.startService());
+			services.forEach(service -> service.startService());
 			executed = true;
 		} catch (ServiceException serviceException) {
 			serviceException.printStackTrace();
@@ -42,7 +44,8 @@ public class ServiceRunnerImpl implements ServiceRunner {
 	private void retrieveServiceList() {
 		services.add(MessengerImpl.getInstance());
 		services.add(new TemperatureServiceMock());
-		services.add(new DummyService());
+		services.add(new HumidityServiceMock());
+		services.add(new DummyService(Topic.TEMPERATURE, Topic.HUMIDITY));
 	}
 
 }

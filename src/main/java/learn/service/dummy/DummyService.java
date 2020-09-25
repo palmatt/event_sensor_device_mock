@@ -1,5 +1,7 @@
 package learn.service.dummy;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import learn.exception.ServiceException;
@@ -14,24 +16,25 @@ public class DummyService implements MyService {
 	private Messenger messenger;
 	private volatile boolean running = false;
 	private Listener listener;
+	private List<Topic> subscribedTopics;
 
-	public DummyService() {
+	public DummyService(Topic... topics) {
 		logger = Logger.getAnonymousLogger();
 		messenger = MessengerImpl.getInstance();
+		subscribedTopics = new ArrayList<>(List.of(topics));
 	}
 
 	@Override
 	public void startService() throws ServiceException {
 		running = true;
 		listener = new DummyServiceListener();
-		messenger.subscribe(Topic.TEMPERATURE, listener);
+		subscribedTopics.forEach(topic -> messenger.subscribe(topic, listener));
 	}
 
 	@Override
 	public void stopService() {
 		running = false;
-		messenger.unSubscribe(Topic.TEMPERATURE, listener);
-
+		subscribedTopics.forEach(topic -> messenger.unSubscribe(topic, listener));
 	}
 
 	protected void consumeInfo(String message) {
