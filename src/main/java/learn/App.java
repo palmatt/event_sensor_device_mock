@@ -5,9 +5,8 @@ import learn.runner.ServiceRunnerImpl;
 
 public class App {
 
-	public static void main(String... args) {
+	public App() {
 		ServiceRunner runner = ServiceRunnerImpl.getInstance();
 		runner.startServices();
 	}
-
 }
