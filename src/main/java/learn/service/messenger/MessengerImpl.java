@@ -21,7 +21,7 @@ public class MessengerImpl implements MyService, Messenger, Runnable {
 
 	private MessengerImpl() {
 		topicListenerPair = new ConcurrentHashMap<>();
-		messages = new ConcurrentLinkedQueue<Message>();
+		messages = new ConcurrentLinkedQueue<>();
 	}
 
 	public static MessengerImpl getInstance() {
@@ -96,7 +96,9 @@ public class MessengerImpl implements MyService, Messenger, Runnable {
 
 	@Override
 	public void unSubscribe(Topic topic, Listener listener) {
-		// TODO Auto-generated method stub
-
+		List<Listener> listenerList = topicListenerPair.get(topic);
+		if (listenerList.contains(listener)) {
+			listenerList.remove(listener);
+		}
 	}
 }

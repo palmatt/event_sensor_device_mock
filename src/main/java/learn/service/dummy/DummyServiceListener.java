@@ -19,12 +19,11 @@ public class DummyServiceListener implements Listener {
 
 	@Override
 	public void onMessage(Object message) throws ListenerException {
-		if (message instanceof String) {
+		if (!(message instanceof String)) {
 			if (service != null) {
-				service.consumeInfo((String) message);
-
+				service.consumeInfo(message.toString());
 			} else {
-				logger.info((String) message);
+				logger.info(message.toString());
 			}
 		}
 	}

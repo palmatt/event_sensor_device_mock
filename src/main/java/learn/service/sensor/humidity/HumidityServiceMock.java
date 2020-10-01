@@ -1,7 +1,6 @@
 package learn.service.sensor.humidity;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -9,6 +8,7 @@ import learn.exception.ServiceException;
 import learn.service.MyService;
 import learn.service.messenger.Messenger;
 import learn.service.messenger.MessengerImpl;
+import learn.service.messenger.message.Reading;
 import learn.service.messenger.topic.Topic;
 import learn.service.sensor.Sensor;
 
@@ -38,6 +38,7 @@ public class HumidityServiceMock implements MyService, Runnable, Sensor {
 			try {
 				sendMessageAndWait();
 				updateValue();
+				correctValue();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				Thread.currentThread()
@@ -65,16 +66,14 @@ public class HumidityServiceMock implements MyService, Runnable, Sensor {
 	}
 
 	private void sendMessageAndWait() throws InterruptedException {
-		String message = generateMessage();
-		messenger.publish(Topic.HUMIDITY, message);
+		Reading reading = generateMessage();
+		messenger.publish(Topic.HUMIDITY, reading);
 		Thread.sleep(1000);
 	}
 
-	private String generateMessage() {
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss ");
+	private Reading generateMessage() {
 		LocalDateTime now = LocalDateTime.now();
-
-		return dateTimeFormatter.format(now) + name + ": " + humidity;
+		return new Reading(now, name, String.valueOf(humidity.get()));
 	}
 
 	private void updateValue() {
@@ -99,4 +98,12 @@ public class HumidityServiceMock implements MyService, Runnable, Sensor {
 		return randomNumber - random.nextInt(2);
 	}
 
+	private void correctValue() {
+		int value = humidity.get();
+		if (value > 99) {
+			humidity.set(value - 10);
+		} else if (value < 1) {
+			humidity.set(value + 10);
+		}
+	}
 }

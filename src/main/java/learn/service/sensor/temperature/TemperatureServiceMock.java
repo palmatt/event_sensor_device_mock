@@ -1,7 +1,6 @@
 package learn.service.sensor.temperature;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -9,6 +8,7 @@ import learn.exception.ServiceException;
 import learn.service.MyService;
 import learn.service.messenger.Messenger;
 import learn.service.messenger.MessengerImpl;
+import learn.service.messenger.message.Reading;
 import learn.service.messenger.topic.Topic;
 import learn.service.sensor.Sensor;
 
@@ -38,6 +38,7 @@ public class TemperatureServiceMock implements MyService, Runnable, Sensor {
 			try {
 				sendMessageAndWait();
 				updateValue();
+				correctValue();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				Thread.currentThread()
@@ -65,16 +66,15 @@ public class TemperatureServiceMock implements MyService, Runnable, Sensor {
 	}
 
 	private void sendMessageAndWait() throws InterruptedException {
-		String message = generateMessage();
-		messenger.publish(Topic.TEMPERATURE, message);
+		Reading reading = generateMessage();
+		messenger.publish(Topic.TEMPERATURE, reading);
 		Thread.sleep(1000);
 	}
 
-	private String generateMessage() {
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss ");
+	private Reading generateMessage() {
 		LocalDateTime now = LocalDateTime.now();
-
-		return dateTimeFormatter.format(now) + name + ": " + temperature;
+		
+		return new Reading(now, name, String.valueOf(temperature.get()));
 	}
 
 	private void updateValue() {
@@ -97,5 +97,14 @@ public class TemperatureServiceMock implements MyService, Runnable, Sensor {
 	private int calculateOffset() {
 		int randomNumber = random.nextInt(2);
 		return randomNumber - random.nextInt(2);
+	}
+
+	private void correctValue() {
+		int value = temperature.get();
+		if (value > 40) {
+			temperature.set(value - 10);
+		} else if (value < -25) {
+			temperature.set(value + 10);
+		}
 	}
 }
